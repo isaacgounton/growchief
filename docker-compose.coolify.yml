@@ -95,7 +95,7 @@ services:
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=temporal-postgresql
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/docker.yaml
       - ENABLE_ES=true
       - ES_SEEDS=temporal-elasticsearch
       - ES_VERSION=v7
@@ -149,5 +149,4 @@ networks:
   growchief-network:
     external: false
   temporal-network:
-    driver: bridge
-    name: temporal-network
+    external: false

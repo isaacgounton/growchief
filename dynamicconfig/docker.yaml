@@ -1,0 +1,23 @@
+system.forceSearchAttributesCacheRefreshOnRead:
+  - value: true
+    constraints: {}
+
+system.enableLoggerRateLimiting:
+  - value: true
+    constraints: {}
+
+limit.maxIDLength:
+  - value: 1000
+    constraints: {}
+
+limit.blobSizeLimitError:
+  - value: 2000000
+    constraints: {}
+
+limit.blobSizeLimitWarn:
+  - value: 512000
+    constraints: {}
+
+frontend.enableUpdateWorkflowExecution:
+  - value: true
+    constraints: {}
