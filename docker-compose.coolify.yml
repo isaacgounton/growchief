@@ -31,7 +31,7 @@ services:
       growchief-postgres:
         condition: service_healthy
       temporal:
-        condition: service_healthy
+        condition: service_started
 
   growchief-postgres:
     image: postgres:16
@@ -87,6 +87,7 @@ services:
 
   temporal:
     container_name: temporal
+    restart: always
     ports:
       - "7233:7233"
     image: temporalio/auto-setup:1.28.1
@@ -110,12 +111,6 @@ services:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
     labels:
       kompose.volume.type: configMap
-    healthcheck:
-      test: ["CMD", "tctl", "cluster", "health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   temporal-admin-tools:
     container_name: temporal-admin-tools
