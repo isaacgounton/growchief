@@ -12,9 +12,11 @@ services:
       UPLOAD_DIRECTORY: "/uploads"
       NEXT_PUBLIC_UPLOAD_DIRECTORY: "/uploads"
       AUTH_SECRET: "YourSpecialString!@#111"
-      GOOGLE_CLIENT_ID: "For Login With Google Client ID"
-      GOOGLE_CLIENT_SECRET: "For Login With Google Client Secret"
+      GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_SECRET: ""
       TEMPORAL_ADDRESS: "temporal:7233"
+      TEMPORAL_CONNECTION_TIMEOUT: "30000"
+      TEMPORAL_MAX_RETRY_ATTEMPTS: "5"
       APOLLO_API_KEY: ""
       DATAGMA_API_KEY: ""
     volumes:
@@ -27,6 +29,8 @@ services:
       - temporal-network
     depends_on:
       growchief-postgres:
+        condition: service_healthy
+      temporal:
         condition: service_healthy
 
   growchief-postgres:
@@ -106,6 +110,12 @@ services:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
     labels:
       kompose.volume.type: configMap
+    healthcheck:
+      test: ["CMD", "tctl", "cluster", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   temporal-admin-tools:
     container_name: temporal-admin-tools
