@@ -178,4 +178,12 @@ export class BillingController {
         })),
     }));
   }
+
+  @Get('/credits')
+  getCredits(
+    @GetOrganizationFromRequest()
+    organization: Organization,
+  ) {
+    return this._subscriptionService.getCredits(organization.id);
+  }
 }

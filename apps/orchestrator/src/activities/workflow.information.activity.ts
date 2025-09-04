@@ -8,6 +8,9 @@ import { botList } from '@growchief/shared-backend/bots/bot.list';
 import { URLService } from '@growchief/shared-both/utils/url.normalize';
 import type { RestrictionType } from '@growchief/shared-backend/temporal/progress.response';
 import dayjs from 'dayjs';
+import { makeId } from '@growchief/shared-both/utils/make.id';
+import { SubscriptionService } from '@growchief/shared-backend/database/subscription/subscription.service';
+import type { EnrichmentReturn } from '@growchief/shared-backend/enrichment/enrichment.interface';
 
 @Injectable()
 @Activity()
@@ -16,6 +19,7 @@ export class WorkflowInformationActivity {
     private _botsService: BotsService,
     private _workflowService: WorkflowsService,
     private _urlService: URLService,
+    private _subscriptionService: SubscriptionService,
   ) {}
 
   @ActivityMethod()
@@ -98,28 +102,55 @@ export class WorkflowInformationActivity {
         body,
       );
 
-      if (!lead) {
-        continue;
-      }
-
-      const url = lead.url.match(getBot.urlRegex);
-
-      if (!url) {
-        continue;
-      }
-
       listFlows.push({
+        identifier: makeId(10),
         platform: data.account.platform,
         organizationId: workflow.organizationId,
         workflowId: workflowId,
         nodeId: node.id,
         botId: data.account.id,
-        url: lead.url,
-        leadId: lead.id,
+        leadId: lead?.id,
+        url: lead?.url,
       });
     }
 
     return listFlows;
+  }
+
+  @ActivityMethod()
+  addAndReturnLead(
+    orgId: string,
+    workflowId: string,
+    platform: string,
+    email: string,
+    value: EnrichmentReturn,
+  ) {
+    let { url } = value;
+    const getBot = botList.find((p) => p.identifier === platform)!;
+
+    url = [url].map((url) => {
+      const normalized = this._urlService.normalizeUrlSafe(url);
+      if (getBot.isWWW) {
+        return normalized.indexOf('//www.') === -1
+          ? normalized.replace('://', '://www.')
+          : normalized;
+      } else {
+        return normalized.replace('://www.', '://');
+      }
+    })[0];
+
+    return this._workflowService.processEnrichment(
+      orgId,
+      workflowId,
+      platform,
+      {
+        urls: [url],
+        email: email || '',
+        firstName: value.firstName || '',
+        lastName: value.lastName || '',
+        organization_name: '',
+      },
+    );
   }
 
   @ActivityMethod()
@@ -153,5 +184,15 @@ export class WorkflowInformationActivity {
         .toDate();
       await this._botsService.saveRestriction(botId, methodName, date);
     }
+  }
+
+  @ActivityMethod()
+  async getCredits(organizationId: string) {
+    return this._subscriptionService.getCredits(organizationId);
+  }
+
+  @ActivityMethod()
+  async consumeCredits(organizationId: string, amount: number) {
+    return this._subscriptionService.consumeCredits(organizationId, amount);
   }
 }

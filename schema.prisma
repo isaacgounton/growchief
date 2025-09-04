@@ -46,6 +46,7 @@ model Organization {
   proxies           Proxy[]
   plugs             Plugs[]
   actions           SavedActions[]
+  credits           Credits[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,6 +77,7 @@ model Subscription {
   identifier     String
   total          Int          @default(1)
   interval       Interval
+  monthlyCredits Int          @default(200)
   cancel_at      DateTime?
 
   createdAt DateTime @default(now())
@@ -334,6 +336,17 @@ model SavedActions {
   @@index([organizationId])
   @@index([createdAt])
   @@index([deletedAt])
+}
+
+model Credits {
+  id             String       @id @default(uuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  total          Int
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId])
+  @@index([createdAt])
 }
 
 enum InviteStatus {

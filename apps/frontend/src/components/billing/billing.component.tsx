@@ -315,6 +315,32 @@ ${
                     </svg>
                     <div className="flex gap-[8px] items-center flex-1">
                       <span className="text-[14px] text-primary">
+                        Monthly Credits
+                      </span>
+                      <div className="flex items-center">
+                        <div className="text-[12px] bg-background text-secondary px-[6px] py-[2px] rounded-[4px]">
+                          {200 * (quantities[plan.identifier] || 1)}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <svg
+                      className="w-5 h-5 text-btn-primary mr-[8px] mt-[2px] flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <div className="flex gap-[8px] items-center flex-1">
+                      <span className="text-[14px] text-primary">
                         Total Accounts
                       </span>
                       <div className="flex items-center">

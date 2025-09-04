@@ -8,6 +8,7 @@ export const billingPlans: Plans[] = [
   {
     identifier: identifier.normal,
     name: 'Ultimate',
+    credits: 200,
     month: {
       price: 50,
       currency: 'usd',

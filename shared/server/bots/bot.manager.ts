@@ -692,7 +692,7 @@ export class BotManager extends BotTools {
     // The proxy is not working, better to try the same request again we don't want to save the new state
     if (race === 'proxy') {
       return {
-        delay: 3600000,
+        delay: 1_800_000,
         endWorkflow: false,
         repeatJob: true,
       };

@@ -17,9 +17,6 @@ import { botList } from '@growchief/shared-backend/bots/bot.list';
 import { UploadLeadsDto } from '@growchief/shared-both/dto/workflows/upload.leads.dto';
 import { URLService } from '@growchief/shared-both/utils/url.normalize';
 import { LeadsService } from '@growchief/shared-backend/database/leads/leads.service';
-import { providerList } from '@growchief/shared-backend/enrichment/provider.list';
-import { awaitedTryCatch } from '@growchief/shared-both/utils/awaited.try.catch';
-import { workflowCampaign } from '@growchief/orchestrator/workflows';
 
 @Injectable()
 export class WorkflowsService {
@@ -318,6 +315,14 @@ export class WorkflowsService {
       await this._workflowsRepository.deleteWorkflow(id, organizationId);
     }
 
+    try {
+      await (
+        await this._temporal.getClient().getWorkflowHandle('enrichment')
+      ).signal('removeNodesFromQueueByWorkflowIdSignal', id);
+    } catch (error) {
+      console.log(`Failed to remove jobs from queue`, error.message);
+    }
+
     if (botIds.length) {
       for (const bot of botIds) {
         try {
@@ -443,63 +448,26 @@ export class WorkflowsService {
       return getLead;
     }
 
-    for (const provider of providerList.filter((f) =>
-      f.supportedIdentifiers.includes(platform),
-    )) {
-      const tool = botList.find((p) => p.identifier === platform)!;
+    const tool = botList.find((p) => p.identifier === platform)!;
 
-      if (enrichment?.urls?.length && !forceEnrichment) {
-        const findUrl = enrichment.urls.find((p) => p.match(tool.urlRegex));
-        if (findUrl) {
-          const createdLead = await this._leadsService.createLead(
-            organizationId,
-            workflowId,
-            platform,
-            { ...enrichment, url: findUrl },
-          );
+    if (enrichment?.urls?.length && !forceEnrichment) {
+      const findUrl = enrichment.urls.find((p) => p.match(tool.urlRegex));
+      if (findUrl) {
+        const createdLead = await this._leadsService.createLead(
+          organizationId,
+          workflowId,
+          platform,
+          { ...enrichment, url: findUrl },
+        );
 
-          await this._leadsService.addLeadToWorkflow(
-            organizationId,
-            workflowId,
-            createdLead.id,
-          );
+        await this._leadsService.addLeadToWorkflow(
+          organizationId,
+          workflowId,
+          createdLead.id,
+        );
 
-          return createdLead;
-        }
+        return createdLead;
       }
-
-      const lead = await awaitedTryCatch(() =>
-        provider.enrich(platform, enrichment),
-      );
-
-      if (!lead) {
-        continue;
-      }
-
-      lead.url = this._urlService.normalizeUrlSafe(lead.url);
-      if (tool.isWWW) {
-        lead.url =
-          lead.url.indexOf('//www.') === -1
-            ? lead.url.replace('://', '://www.')
-            : lead.url;
-      } else {
-        lead.url = lead.url.replace('://www.', '://');
-      }
-
-      const createdLead = await this._leadsService.createLead(
-        organizationId,
-        workflowId,
-        platform,
-        { ...lead, ...enrichment },
-      );
-
-      await this._leadsService.addLeadToWorkflow(
-        organizationId,
-        workflowId,
-        createdLead.id,
-      );
-
-      return createdLead;
     }
   }
 

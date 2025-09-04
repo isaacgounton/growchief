@@ -25,6 +25,7 @@ import { ModalManager } from "@growchief/frontend/utils/modal.manager";
 import { NotificationsComponent } from "@growchief/frontend/components/notifications/notifications.component.tsx";
 import { CheckSubscription } from "@growchief/frontend/components/layout/check.subscription.tsx";
 import { SuperAdminComponent } from "@growchief/frontend/components/layout/super.admin.component.tsx";
+import { CreditsComponent } from "@growchief/frontend/components/layout/credits.component.tsx";
 import clsx from "clsx";
 import { OnboardingComponent } from "@growchief/frontend/components/onboarding/onboarding.component.tsx";
 
@@ -32,7 +33,7 @@ export const Layout: FC = () => {
   const fetch = useFetch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, setUser } = useBearStore(
-    useShallow((state) => ({ user: state.user, setUser: state.setUser }))
+    useShallow((state) => ({ user: state.user, setUser: state.setUser })),
   );
 
   const loadUser = useCallback(async () => {
@@ -112,13 +113,13 @@ export const Layout: FC = () => {
             // Mobile menu visibility
             isMobileMenuOpen
               ? "max-lg:translate-x-0"
-              : "max-lg:-translate-x-full"
+              : "max-lg:-translate-x-full",
           )}
         >
           <div
             className={clsx(
               "lg:fixed lg:left-[17px] lg:top-0 blurMe h-full pt-[32px] pb-[15px] px-[8px] flex flex-col gap-[32px]",
-              user.isSuperAdmin && "pt-[85px]"
+              user.isSuperAdmin && "pt-[85px]",
             )}
           >
             {/* Mobile close button */}
@@ -211,8 +212,12 @@ export const Layout: FC = () => {
                 <NotificationsComponent />
                 <div className="hidden sm:block w-[1px] h-[24px] bg-secondary/20" />
                 <ModeIcon />
+                <div className="hidden lg:block w-[1px] h-[24px] bg-secondary/20" />
                 <div className="hidden sm:block">
                   <OrganizationSelector />
+                </div>
+                <div className="hidden lg:flex justify-center">
+                  <CreditsComponent />
                 </div>
               </div>
             </div>

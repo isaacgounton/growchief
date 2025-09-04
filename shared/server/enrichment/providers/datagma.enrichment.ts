@@ -7,8 +7,9 @@ export class DatagmaEnrichment implements EnrichmentInterface {
   name = 'Datagma';
   priority = 1;
   supportedIdentifiers = ['linkedin', 'x'];
-  // @ts-ignore
-  apiKey: !!process.env.DATAGMA_API_KEY;
+  get apiKey() {
+    return process.env.DATAGMA_API_KEY;
+  }
 
   async enrich(
     platform: string,
@@ -22,7 +23,7 @@ export class DatagmaEnrichment implements EnrichmentInterface {
       email: string;
       organization_name?: string;
     },
-  ): Promise<EnrichmentReturn | false> {
+  ): Promise<EnrichmentReturn | false | { delay: number }> {
     if (platform === 'linkedin') {
       const listQuery = {
         ...(firstName && lastName
@@ -72,7 +73,7 @@ export class DatagmaEnrichment implements EnrichmentInterface {
 
       const value = await (
         await fetch(
-          `https://gateway.datagma.net/api/ingress/v1/twitter/by_email&apiId=${process.env.DATAGMA_API_KEY}&${list}`,
+          `https://gateway.datagma.net/api/ingress/v1/twitter/by_email?apiId=${process.env.DATAGMA_API_KEY}&${list}`,
           {
             method: 'GET',
             headers: {

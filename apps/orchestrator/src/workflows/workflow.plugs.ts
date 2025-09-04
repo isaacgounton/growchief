@@ -110,9 +110,7 @@ export async function workflowPlugs({
 
         await condition(() => triggerStepId === workflowIdInternal);
       });
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
 
     triggerStepId = '';
 

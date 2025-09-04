@@ -8,8 +8,10 @@ export class ApolloEnrichment implements EnrichmentInterface {
   name = 'Apollo';
   priority = 1;
   supportedIdentifiers = ['linkedin'];
-  // @ts-ignore
-  apiKey: !!process.env.APOLLO_API_KEY;
+
+  get apiKey() {
+    return process.env.APOLLO_API_KEY;
+  }
 
   async enrich(
     platform: string,

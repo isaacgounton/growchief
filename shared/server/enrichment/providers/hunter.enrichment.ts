@@ -4,13 +4,13 @@ import {
 } from '@growchief/shared-backend/enrichment/enrichment.interface';
 import { EnrichmentDto } from '@growchief/shared-both/dto/enrichment/enrichment.dto';
 
-export class RocketReachEnrichment implements EnrichmentInterface {
-  name = 'Rocket Reach';
+export class HunterEnrichment implements EnrichmentInterface {
+  name = 'Hunter';
   priority = 1;
   supportedIdentifiers = ['linkedin'];
 
   get apiKey() {
-    return process.env.ROCKETREACH_API_KEY;
+    return process.env.HUNTER_API_KEY;
   }
 
   async enrich(
@@ -27,35 +27,38 @@ export class RocketReachEnrichment implements EnrichmentInterface {
 
     const list = new URLSearchParams(listQuery).toString();
     const req = await fetch(
-      `https://api.rocketreach.co/api/v2/person/lookup?${list}`,
+      `https://api.hunter.io/v2/people/find?${list}&api_key=${process.env.HUNTER_API_KEY}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
           accept: 'application/json',
           'Cache-Control': 'no-cache',
           'Content-Type': 'application/json',
-          'x-api-key': process.env.ROCKETREACH_API_KEY!,
         },
       },
     );
 
-    const value = await req.json();
-
-    if (req.status === 429) {
-      return { delay: value.wait * 1000 };
+    if (req.status === 403) {
+      return { delay: 2000 };
     }
 
-    if (!value?.id || !value.linkedin_url || platform !== 'linkedin') {
+    const value = await req.json();
+
+    if (
+      !value?.data?.id ||
+      !value?.data?.linkedin?.handle ||
+      platform !== 'linkedin'
+    ) {
       return false;
     }
 
-    const [firstName, ...lastName] = value.name || '';
+    const [firstName, ...lastName] = value?.data?.name?.fullName || '';
 
     return {
       firstName: firstName || '',
       lastName: lastName.join(' ') || '',
-      url: value.linkedin_url,
-      picture: value.profile_pic,
+      url: 'https://www.linkedin.com/in/' + value?.data?.linkedin?.handle,
+      picture: '',
     };
   }
 }

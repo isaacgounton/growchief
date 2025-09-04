@@ -38,6 +38,7 @@ export interface BillingInterface {
 export interface Plans {
   name: string;
   identifier: string;
+  credits: number;
   month: {
     price: number;
     currency: string;

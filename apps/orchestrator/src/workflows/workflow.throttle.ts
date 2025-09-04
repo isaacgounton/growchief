@@ -303,6 +303,7 @@ export async function userWorkflowThrottler({
           await startChild(workflowCampaign, {
             workflowId: `campaign-${job.workflowId}-${makeId(20)}`,
             taskQueue: 'main',
+            cancellationType: 'ABANDON' as const,
             args: [
               {
                 orgId: job.orgId,

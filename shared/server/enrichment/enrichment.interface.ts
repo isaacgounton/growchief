@@ -8,7 +8,7 @@ export interface EnrichmentInterface {
   enrich(
     platform: string,
     params: EnrichmentDto,
-  ): Promise<EnrichmentReturn | false>;
+  ): Promise<EnrichmentReturn | false | { delay: number }>;
 }
 
 export interface EnrichmentReturn {

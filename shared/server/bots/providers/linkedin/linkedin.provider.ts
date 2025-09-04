@@ -570,12 +570,8 @@ export class LinkedinProvider extends BotAbstract {
             label: 'My Connections',
           },
           {
-            value: 'my-friends-connections',
-            label: 'My Friends Connections',
-          },
-          {
-            value: 'non-friends-connections',
-            label: 'Non Friends Connections',
+            value: 'not-connected',
+            label: 'Not Connected',
           },
           {
             value: 'people-i-follow',
@@ -595,58 +591,107 @@ export class LinkedinProvider extends BotAbstract {
   })
   async likeAndComment(params: ParamsValue) {
     const { page, cursor } = params;
-    const list = await page.waitForResponse(/voyagerFeedDashMainFeed/);
-    const included = (await list.json()).included;
-    const connectionType = params.cursor.getData()['connection-type'];
-    const content: { id: string; text: string; profile: string }[] = included
-      .filter(
-        (f: any) =>
-          f.commentary && f.entityUrn.indexOf('(urn:li:activity:') > -1,
-      )
-      .map((p: any) => {
-        const txt = p?.actor?.supplementaryActorInfo?.text || '';
-        return {
-          distance:
-            txt.indexOf('Following') > -1
-              ? 4
-              : txt.indexOf('3') > -1
-                ? 3
-                : txt.indexOf('2') > -1
-                  ? 2
-                  : txt.indexOf('1') > -1
-                    ? 1
-                    : undefined,
-          profile:
-            p?.actor?.name?.attributesV2?.[0]?.detailData?.['*profileFullName'],
-          id: p.entityUrn.split('(')[1].split(',')[0],
-          text: p.commentary.text?.text || p.commentary.text,
-        };
-      })
-      .filter((f: any) => {
-        return f.id.indexOf('activity') > -1 && f.profile;
-      })
-      .filter((f: any) => {
-        if (connectionType === 'all') {
-          return true;
-        }
-        if (connectionType === 'my-connections') {
-          return f.distance === 1;
-        }
-        if (connectionType === 'my-friends-connections') {
-          return f.distance === 2;
-        }
-        if (connectionType === 'non-friends-connections') {
-          return f.distance === 3;
-        }
-        if (connectionType === 'people-i-follow') {
-          return f.distance === 4;
-        }
-        return false;
-      })
-      .map((p: any) => ({
-        ...p,
-        profile: `https://www.linkedin.com/in/${included.find((a: any) => a?.entityUrn === p.profile)?.publicIdentifier}`,
-      }));
+    const content = [] as { id: string; text: string; profile: string }[];
+    const pusher = [] as { id: string; text: string; profile: string }[];
+
+    let totalRuns = 0;
+    while (content.length === 0 && totalRuns < 5) {
+      const list = await page.waitForResponse(/voyagerFeedDashMainFeed/);
+      const included = (await list.json()).included;
+      const connectionType = params.cursor.getData()['connection-type'];
+      pusher.push(
+        ...included
+          .filter(
+            (f: any) =>
+              f.commentary && f.entityUrn.indexOf('(urn:li:activity:') > -1,
+          )
+          .map((p: any) => {
+            const txt = p?.actor?.supplementaryActorInfo?.text || '';
+            return {
+              distance:
+                txt.indexOf('Following') > -1
+                  ? 4
+                  : txt.indexOf('3') > -1
+                    ? 3
+                    : txt.indexOf('2') > -1
+                      ? 2
+                      : txt.indexOf('1') > -1
+                        ? 1
+                        : undefined,
+              profile:
+                p?.actor?.name?.attributesV2?.[0]?.detailData?.[
+                  '*profileFullName'
+                ],
+              id: p.entityUrn.split('(')[1].split(',')[0],
+              text: p.commentary.text?.text || p.commentary.text,
+            };
+          })
+          .filter((f: any) => {
+            return f.id.indexOf('activity') > -1 && f.profile;
+          })
+          .map((p: any) => ({
+            ...p,
+            profile: `https://www.linkedin.com/in/${included.find((a: any) => a?.entityUrn === p.profile)?.publicIdentifier}`,
+          })),
+      );
+      content.push(
+        ...included
+          .filter(
+            (f: any) =>
+              f.commentary && f.entityUrn.indexOf('(urn:li:activity:') > -1,
+          )
+          .map((p: any) => {
+            const txt = p?.actor?.supplementaryActorInfo?.text || '';
+            return {
+              distance:
+                txt.indexOf('Following') > -1
+                  ? 4
+                  : txt.indexOf('3') > -1
+                    ? 3
+                    : txt.indexOf('2') > -1
+                      ? 2
+                      : txt.indexOf('1') > -1
+                        ? 1
+                        : undefined,
+              profile:
+                p?.actor?.name?.attributesV2?.[0]?.detailData?.[
+                  '*profileFullName'
+                ],
+              id: p.entityUrn.split('(')[1].split(',')[0],
+              text: p.commentary.text?.text || p.commentary.text,
+            };
+          })
+          .filter((f: any) => {
+            return f.id.indexOf('activity') > -1 && f.profile;
+          })
+          .filter((f: any) => {
+            if (connectionType === 'all') {
+              return true;
+            }
+            if (connectionType === 'my-connections') {
+              return f.distance === 1;
+            }
+            if (connectionType === 'not-connected') {
+              return f.distance === 2 || f.distance === 3;
+            }
+            if (connectionType === 'people-i-follow') {
+              return f.distance === 4;
+            }
+            return false;
+          })
+          .map((p: any) => ({
+            ...p,
+            profile: `https://www.linkedin.com/in/${included.find((a: any) => a?.entityUrn === p.profile)?.publicIdentifier}`,
+          })),
+      );
+
+      if (content.length === 0) {
+        page.evaluate('window.scrollTo(0, document.body.scrollHeight);');
+      }
+      totalRuns++;
+    }
+
+    await page.evaluate('window.scrollTo(0, 0);');
 
     const used = await cursor.checkUsed(
       content.reduce(

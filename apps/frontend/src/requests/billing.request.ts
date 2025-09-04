@@ -10,8 +10,14 @@ export const useBillingRequest = () => {
     return (await fetch("/billing/pricing")).json();
   }, []);
 
+  const credits = useCallback(async () => {
+    return (await fetch("/billing/credits")).json();
+  }, []);
+
   return {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     pricing: () => useSWR<PricingPlan[]>("pricing", pricing),
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    credits: () => useSWR("credits", credits),
   };
 };

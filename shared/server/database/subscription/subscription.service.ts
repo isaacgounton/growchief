@@ -26,6 +26,14 @@ export class SubscriptionService {
     );
   }
 
+  async getCredits(organizationId: string) {
+    return this._subscriptionRepository.getCredits(organizationId);
+  }
+
+  async consumeCredits(organizationId: string, credits: number) {
+    return this._subscriptionRepository.consumeCredits(organizationId, credits);
+  }
+
   deleteSubscription(orgId: string) {
     return this._subscriptionRepository.deleteSubscription(orgId);
   }

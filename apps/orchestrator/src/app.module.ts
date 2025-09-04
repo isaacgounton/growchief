@@ -8,6 +8,7 @@ import { DeactivateSubscriptionActivity } from '@growchief/orchestrator/activiti
 import { EmailActivity } from '@growchief/orchestrator/activities/email.activity';
 import { NotificationActivity } from '@growchief/orchestrator/activities/notification.activity';
 import { PlugsActivity } from '@growchief/orchestrator/activities/plugs.activity';
+import { EnrichmentActivity } from '@growchief/orchestrator/activities/enrichment.activity';
 @Module({
   imports: [
     SharedServerModule,
@@ -19,6 +20,7 @@ import { PlugsActivity } from '@growchief/orchestrator/activities/plugs.activity
       EmailActivity,
       NotificationActivity,
       PlugsActivity,
+      EnrichmentActivity,
     ]),
   ],
   controllers: [],
