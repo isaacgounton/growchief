@@ -85,39 +85,6 @@ services:
     volumes:
       - /var/lib/postgresql/data
 
-  temporal-config:
-    image: alpine:latest
-    container_name: temporal-config
-    volumes:
-      - temporal-config:/config
-    command: >
-      sh -c "
-      mkdir -p /config/dynamicconfig &&
-      cat > /config/dynamicconfig/docker.yaml << 'EOF'
-      system.forceSearchAttributesCacheRefreshOnRead:
-        - value: true
-          constraints: {}
-      system.enableLoggerRateLimiting:
-        - value: true
-          constraints: {}
-      limit.maxIDLength:
-        - value: 1000
-          constraints: {}
-      limit.blobSizeLimitError:
-        - value: 2000000
-          constraints: {}
-      limit.blobSizeLimitWarn:
-        - value: 512000
-          constraints: {}
-      frontend.enableUpdateWorkflowExecution:
-        - value: true
-          constraints: {}
-      EOF
-      echo 'Config created successfully' &&
-      cat /config/dynamicconfig/docker.yaml &&
-      sleep 5
-      "
-
   temporal:
     container_name: temporal
     restart: always
@@ -127,14 +94,13 @@ services:
     depends_on:
       - temporal-postgresql
       - temporal-elasticsearch
-      - temporal-config
     environment:
       - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=temporal-postgresql
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/docker.yaml
+      - DYNAMIC_CONFIG_FILE_PATH=dynamicconfig/docker.yaml
       - ENABLE_ES=true
       - ES_SEEDS=temporal-elasticsearch
       - ES_VERSION=v7
@@ -142,7 +108,7 @@ services:
     networks:
       - temporal-network
     volumes:
-      - temporal-config:/etc/temporal/config
+      - ./dynamicconfig:/etc/temporal/dynamicconfig
     labels:
       kompose.volume.type: configMap
 
@@ -179,8 +145,6 @@ volumes:
   growchief-config:
     external: false
   growchief-uploads:
-    external: false
-  temporal-config:
     external: false
 
 # -----------------------
