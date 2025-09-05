@@ -72,6 +72,7 @@
     "dayjs": "^1.11.13",
     "ghost-cursor": "^1.4.1",
     "googleapis": "^155.0.1",
+    "https-proxy-agent": "^7.0.6",
     "is-domain-name": "^1.0.1",
     "is-ip": "^5.0.1",
     "jsonwebtoken": "^9.0.2",

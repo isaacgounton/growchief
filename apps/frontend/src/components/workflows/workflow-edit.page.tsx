@@ -47,7 +47,6 @@ export const WorkflowEditPageData: FC = () => {
   const { data, isLoading } = useWorkflowById(params.id || "");
   const [load, setLoad] = useState(false);
 
-  console.log(data);
   useEffect(() => {
     setLoad(true);
 

@@ -77,6 +77,7 @@ export class ProxiesRepository {
         country: true,
         createdAt: true,
         updatedAt: true,
+        data: true,
         bots: {
           where: {
             deletedAt: null,

@@ -141,6 +141,9 @@ importers:
       googleapis:
         specifier: ^155.0.1
         version: 155.0.1
+      https-proxy-agent:
+        specifier: ^7.0.6
+        version: 7.0.6
       is-domain-name:
         specifier: ^1.0.1
         version: 1.0.1

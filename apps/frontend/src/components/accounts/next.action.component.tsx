@@ -108,7 +108,7 @@ export const NextActionComponent: FC<{ id: string }> = ({ id }) => {
       <div className="flex flex-col gap-[2px]">
         <div className="flex items-center gap-[6px] text-[12px]">
           <div className="w-[6px] h-[6px] bg-green-400 rounded-full" />
-          <span className="text-primary font-medium">Next Step</span>
+          <span className="text-primary font-medium">Next Step {status?.stepDetails?.stepName}</span>
         </div>
         <div className="text-[11px] text-secondary pl-[12px]">
           {capitalize(status.stepDetails.workflowName)} • {timeInfo}

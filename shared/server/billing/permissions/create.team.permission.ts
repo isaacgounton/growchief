@@ -27,7 +27,6 @@ export class CreateTeamPermission implements PermissionInterface {
     organization: Organization,
     definition: Definition,
   ): Promise<true | string> {
-    console.log(organization, definition);
     return true;
   }
 

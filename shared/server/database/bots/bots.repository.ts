@@ -622,7 +622,7 @@ export class BotsRepository {
     const data = JSON.parse(step.data || '{}');
 
     return {
-      stepName: this._getStepDisplayName(step.type, data),
+      stepName: data.label, // this._getStepDisplayName(step.type, data),
       workflowName: step.workflow.name,
       stepType: step.type,
       data,

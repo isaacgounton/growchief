@@ -70,7 +70,6 @@ export const highOrderNode = (params: {
       refs[id] ??= isValidAndFocus;
 
       return () => {
-        console.log("deleting");
         delete refs[id];
       };
     }, []);

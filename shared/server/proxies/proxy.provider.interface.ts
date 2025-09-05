@@ -8,4 +8,5 @@ export interface ProxyProviderInterface<T> {
   deleteProxy(ip: string, data: T): Promise<any>;
   getAllIps(): Promise<{ ip: string; data: any }[]>;
   connectURL(): string;
+  whiteListIp?(data: any): Promise<any>;
 }

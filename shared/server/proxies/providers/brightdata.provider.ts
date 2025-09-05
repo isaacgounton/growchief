@@ -3,6 +3,7 @@ import { getName } from 'country-list';
 import { sortBy } from 'lodash';
 import { ProxyProviderInterface } from '@growchief/shared-backend/proxies/proxy.provider.interface';
 import { makeId } from '@growchief/shared-both/utils/make.id';
+import { timer } from '@growchief/shared-both/utils/timer';
 
 const uniqIdentifier = 'isp';
 
@@ -58,6 +59,17 @@ export class BrightDataProvider
     return 'brd.superproxy.io:33335';
   }
 
+  async whiteListIp(data: { zone: string; ip: string }): Promise<any> {
+    const { ip } = await (
+      await fetch('https://api.ipify.org?format=json')
+    ).json();
+
+    return brightData.post('/zone/whitelist', {
+      ip,
+      zone: data.zone,
+    });
+  }
+
   async countryList(): Promise<{ identifier: string; label: string }[]> {
     const data = (await brightData.get<any>('/countrieslist')).data;
     return sortBy(
@@ -91,6 +103,18 @@ export class BrightDataProvider
         },
       },
     });
+
+    if (process.env.BRIGHTDATA_STATIC_PROXY_IPS) {
+      const ips = (process.env.BRIGHTDATA_STATIC_PROXY_IPS || '').split(',');
+      for (const ip of ips) {
+        await this.whiteListIp({
+          zone: country + '_' + uniqIdentifier + '_' + randomId,
+          ip,
+        });
+
+        await timer(1000);
+      }
+    }
 
     return (
       await brightData.post<any>('/zone/ips', {

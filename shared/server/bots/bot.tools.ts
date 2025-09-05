@@ -11,6 +11,7 @@ import { timer } from '@growchief/shared-both/utils/timer';
 import { ProgressResponse } from '@growchief/shared-backend/temporal/progress.response';
 import { LeadsService } from '@growchief/shared-backend/database/leads/leads.service';
 import axios from 'axios';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 export class BotTools {
   constructor(
@@ -42,15 +43,11 @@ export class BotTools {
       try {
         if (proxy) {
           try {
-            await axios.get('http://httpbin.org/ip', {
-              proxy: {
-                host: proxy.server.split(':')[0],
-                port: +proxy.server.split(':')[1],
-                auth: {
-                  username: proxy.username,
-                  password: proxy.password,
-                },
-              },
+            const proxyUrl = `http://${encodeURIComponent(proxy.username)}:${encodeURIComponent(proxy.password)}@${proxy.server}`;
+            const agent = new HttpsProxyAgent(proxyUrl);
+            await axios.get('https://example.com', {
+              httpsAgent: agent,
+              proxy: false,
               timeout: 5000,
             });
           } catch (err) {

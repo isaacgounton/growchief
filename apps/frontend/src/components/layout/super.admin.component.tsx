@@ -71,7 +71,6 @@ export const ViewasComponentInner: FC<{
   useEffect(() => {
     if (viewingAs) {
       fetchUsers(viewingAs).then((p) => {
-        console.log(p[0].user.email);
         setCurrent(p[0].user.email);
       });
     }

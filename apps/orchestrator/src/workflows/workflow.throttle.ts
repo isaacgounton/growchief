@@ -64,6 +64,9 @@ const { getBot } = proxyActivities<WorkflowInformationActivity>({
 const { progress, getGap } = proxyActivities<AccountsStepActivity>({
   startToCloseTimeout: PROGRESS_DEADLINE,
   heartbeatTimeout: '30 seconds',
+  retry: {
+    maximumAttempts: 1,
+  },
 });
 
 const { sendNotification } = proxyActivities<NotificationActivity>({
