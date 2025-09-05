@@ -65,6 +65,7 @@ export async function workflowPlugs({
     scope?.cancel();
   });
 
+  let runs = 0;
   while (true) {
     triggerStepId = '';
     scope = new CancellationScope({ cancellable: true });
@@ -120,9 +121,14 @@ export async function workflowPlugs({
     const randomMs = min + Math.floor(Math.random() * (max - min));
 
     await sleep(randomMs);
-    await continueAsNew({
-      botId,
-      orgId,
-    });
+
+    if (runs > 50) {
+      return continueAsNew({
+        botId,
+        orgId,
+      });
+    }
+
+    runs++;
   }
 }

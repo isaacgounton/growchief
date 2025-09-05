@@ -392,11 +392,13 @@ export async function userWorkflowThrottler({
     // prevent race condition if there are
     await sleep(1);
 
-    await continueAsNew({
-      nextAllowedAt: currentNextAllowedAt,
-      active,
-      logged,
-      q,
-    });
+    if (q.length === 0 || q.length === 50) {
+      return continueAsNew({
+        nextAllowedAt: currentNextAllowedAt,
+        active,
+        logged,
+        q,
+      });
+    }
   }
 }

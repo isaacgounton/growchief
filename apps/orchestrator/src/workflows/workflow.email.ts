@@ -37,7 +37,7 @@ export async function workflowEmail() {
     await sleep(2000);
 
     if (queue.length === 0) {
-      await continueAsNew();
+      return continueAsNew();
     }
   }
 }

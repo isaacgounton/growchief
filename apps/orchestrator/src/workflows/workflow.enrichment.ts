@@ -188,9 +188,11 @@ export async function workflowEnrichment({
       }
     }
 
-    await continueAsNew({
-      queue,
-      limitsDelay,
-    });
+    if (queue.length === 0 || queue.length === 200) {
+      return continueAsNew({
+        queue,
+        limitsDelay,
+      });
+    }
   }
 }
