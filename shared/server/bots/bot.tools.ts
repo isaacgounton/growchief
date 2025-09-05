@@ -54,6 +54,7 @@ export class BotTools {
               timeout: 5000,
             });
           } catch (err) {
+            console.log(err);
             resolve('proxy');
           }
         }

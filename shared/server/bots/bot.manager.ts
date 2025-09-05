@@ -246,6 +246,7 @@ export class BotManager extends BotTools {
       proxyId,
       appendUrl,
       ignoreLead,
+      timezone,
     } = params;
 
     const botInformation = (await this._botService.getBot(bot)) || {
@@ -724,6 +725,8 @@ export class BotManager extends BotTools {
       bot,
       state,
       race !== 'logout' && race !== false,
+      timezone || 0,
+      proxyId,
     );
 
     // if we are logged out, and we shouldn't skip the queue, let's re-login

@@ -34,6 +34,7 @@ export class BotsSockets {
     @MessageBody('source') source: 'login' | 'screenShare',
     @MessageBody('bot') bot: string,
     @MessageBody('groupId') groupId: string,
+    @MessageBody('timezone') timezone: number,
     @MessageBody('platform') platform: string,
     @MessageBody('proxyId') proxyId?: string,
   ) {
@@ -53,6 +54,7 @@ export class BotsSockets {
       url: '',
       leadId: '',
       proxyId,
+      timezone,
     });
   }
 

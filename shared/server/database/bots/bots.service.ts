@@ -261,6 +261,8 @@ export class BotsService {
     bot: string,
     storage: object,
     loggedIn: boolean,
+    timezone: number,
+    proxyId?: string,
   ) {
     const saveBot = await this._botsRepository.saveStorageAndActions(
       orgId,
@@ -272,6 +274,8 @@ export class BotsService {
       bot,
       storage,
       loggedIn,
+      timezone,
+      proxyId,
     );
 
     if (functionName === 'login' && loggedIn && saveBot.id) {

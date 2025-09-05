@@ -162,4 +162,5 @@ export interface BotsRequestSetupDefault {
   proxyId?: string;
   appendUrl?: string;
   ignoreLead?: boolean;
+  timezone?: number;
 }

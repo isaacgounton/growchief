@@ -436,6 +436,8 @@ export class BotsRepository {
     bot: string,
     storage: object,
     loggedIn: boolean,
+    timezone: number,
+    proxyId?: string,
   ) {
     // This might happen if two bots trying to update the context at the same time, better be careful
     const { logged, id } = await this._prisma.$transaction(async (prism) => {
@@ -457,6 +459,8 @@ export class BotsRepository {
             storage: JSON.stringify(storage),
             status: 'ACTIVE',
             profilePicture: picture,
+            timezone,
+            ...(proxyId ? { proxyId } : {}),
           },
           update: {
             internalId,
@@ -468,6 +472,7 @@ export class BotsRepository {
             status: 'ACTIVE',
             profilePicture: picture,
             deletedAt: null,
+            ...(proxyId ? { proxyId } : {}),
           },
         });
 

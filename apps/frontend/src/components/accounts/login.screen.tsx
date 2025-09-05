@@ -95,6 +95,7 @@ const WebSockets = (params: {
       platform: params.platform,
       groupId: params.groupId,
       proxyId: params.proxyId,
+      timezone: -new Date().getTimezoneOffset() / 60,
     });
   };
 
@@ -106,6 +107,7 @@ const WebSockets = (params: {
       platform: params.platform,
       groupId: params.groupId,
       proxyId: params.proxyId,
+      timezone: -new Date().getTimezoneOffset() / 60,
     });
   };
 
