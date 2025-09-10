@@ -340,6 +340,7 @@ export class LinkedinProvider extends BotAbstract {
                 )
                 .nth(getMenus),
             );
+            res(true);
           } else {
             await params.cursor.click(
               '.top-card-background-hero-image + div .artdeco-dropdown',
@@ -373,6 +374,7 @@ export class LinkedinProvider extends BotAbstract {
             res(true);
           }
         } catch (err) {
+          console.log(err);
           return res(false);
         }
       }),

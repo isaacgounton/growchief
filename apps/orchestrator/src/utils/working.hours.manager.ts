@@ -26,6 +26,7 @@ export class WorkingHoursManager {
   private setupSignalHandler() {
     setHandler(workingHoursUpdated, () => {
       this.shouldRefetchWorkingHours = true;
+      this.cachedWorkingHours = null;
     });
   }
 

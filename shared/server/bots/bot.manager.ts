@@ -27,7 +27,6 @@ import { timer } from '@growchief/shared-both/utils/timer';
 import { ProgressResponse } from '@growchief/shared-backend/temporal/progress.response';
 import { LeadsService } from '@growchief/shared-backend/database/leads/leads.service';
 import { heartbeat } from '@temporalio/activity';
-import { proxyList } from '@growchief/shared-backend/proxies/proxy.list';
 
 const MAXIMUM_RUNNING_TIME = 300000;
 const MAXIMUM_PROCESS_TIME = 240000;
@@ -528,16 +527,32 @@ export class BotManager extends BotTools {
         .catch((err) => {});
     }
 
-    const lead =
+    // when getting a lead, there is chance we are logged out
+    const lead = await Promise.race([
       functionName === 'login' || appendUrl || ignoreLead
-        ? {}
-        : await this.processLead(leadId, () => {
+        ? Promise.resolve({})
+        : this.processLead(leadId, () => {
             return findProvider.processLead({
               page,
               cursor,
               data,
             } satisfies ExactParams);
-          });
+          }),
+      this._checkForLoginElement(
+        functionName !== 'login',
+        cursor.page,
+        findProvider.disconnectedElement,
+      ),
+    ]);
+
+    if (lead === 'logout') {
+      await this._botService.loggedOut(bot);
+      return {
+        delay: 0,
+        endWorkflow: false,
+        repeatJob: true,
+      };
+    }
 
     if (!lead && functionName !== 'login' && functionName !== 'leadList') {
       return {

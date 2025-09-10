@@ -239,7 +239,7 @@ export class BotsService {
 
     await this._notificationManager.sendNotification(
       botModel.organization.id,
-      'You accounts ${botModel.name} has logged out',
+      `You accounts ${botModel.name} has logged out`,
       `
         Your accounts ${botModel.name} has logged out. Please login again to continue the automation.<br />
         https://platform.postiz.com
